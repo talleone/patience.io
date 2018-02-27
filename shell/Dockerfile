@@ -56,17 +56,20 @@ WORKDIR /sawtooth-supply-chain
 COPY bin/splice_json bin/
 COPY asset_client/package.json asset_client/
 COPY fish_client/package.json fish_client/
+COPY patienceio/package.json patienceio/
 COPY server/package.json server/
 
 RUN mkdir /node_deps \
   && bin/splice_json \
     asset_client/package.json \
     fish_client/package.json \
+    patienceio/package.json \
     server/package.json \
     > /node_deps/package.json \
   && cd /node_deps && npm install && cd - \
   && ln -s /node_deps/node_modules asset_client/ \
   && ln -s /node_deps/node_modules fish_client/ \
+  && ln -s /node_deps/node_modules patienceio/ \
   && ln -s /node_deps/node_modules server/
 
 ENV PATH $PATH:/sawtooth-supply-chain/bin

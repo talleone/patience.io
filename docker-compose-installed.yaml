@@ -49,14 +49,11 @@ services:
     depends_on:
       - validator
       - rethink
-    environment:
-      - VALIDATOR_URL=tcp://validator:4004
-      - DB_HOST=rethink
     command: |
       bash -c "
         set -x &&
-        npm run init &&
-        node index.js
+        DB_HOST=rethink npm run init &&
+        VALIDATOR_URL=tcp://validator:4004 DB_HOST=rethink node index.js
       "
 
   ledger-sync:
@@ -65,6 +62,9 @@ services:
     build:
       context: .
       dockerfile: ledger_sync/Dockerfile-installed
+    volumes:
+      - .:/sawtooth-supply-chain/ledger_sync
+      - /sawtooth-supply-chain/ledger_sync/node_modules
     depends_on:
       - validator
       - rethink
@@ -76,8 +76,8 @@ services:
     image: supply-asset-client-installed
     container_name: supply-asset-client-installed
     build:
-      context: .
-      dockerfile: asset_client/Dockerfile-installed
+      context: ./asset_client
+      dockerfile: ./Dockerfile-installed
     expose:
       - 80
     ports:
@@ -89,15 +89,15 @@ services:
     image: supply-fish-client-installed
     container_name: supply-fish-client-installed
     build:
-      context: .
-      dockerfile: fish_client/Dockerfile-installed
+      context: ./fish_client
+      dockerfile: ./Dockerfile-installed
     expose:
       - 80
     ports:
       - '8022:80'
     depends_on:
       - server
-
+  
   patienceio:
     image: supply-patienceio-client-installed
     container_name: supply-patienceio-client-installed

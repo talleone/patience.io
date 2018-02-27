@@ -25,26 +25,16 @@ const {MultiSelect} = require('../components/forms')
 const layout = require('../components/layout')
 
 /**
- * Possible selection options TODELETE
- */
-const authorizableProperties = [
-  ['location', 'Location'],
-  ['temperature', 'Temperature'],
-  ['tilt', 'Tilt'],
-  ['shock', 'Shock']
-]
-
-/**
  * Possible selection options 
  */
 const authorizableProperties = [
-  ['administration', 'Location'],
-  ['plants', 'Temperature'],
-  ['packages', 'Tilt'],
-  ['transfers', 'Shock'],
-  ['sales', 'Shock'],
-  ['reports', 'Shock'],
-  ['financials', 'Shock']
+  ['administration', 'Administration'],
+  ['plants', 'Plants'],
+  ['packages', 'Packages'],
+  ['transfers', 'Transfers'],
+  ['sales', 'Sales'],
+  ['reports', 'Reports'],
+  ['financials', 'Financials']
 ]
 
 /**
@@ -67,7 +57,7 @@ const AddFacilityForm = {
   },
 
   view (vnode) {
-    return m('.fish_form',
+    return m('.facility_form',
              m('form', {
                onsubmit: (e) => {
                  e.preventDefault()
@@ -233,7 +223,7 @@ const _handleSubmit = (signingKey, state) => {
     }))
 
   transactions.submit([recordPayload].concat(reporterPayloads), true)
-    .then(() => m.route.set(`/fish/${state.facilityLicenseNumber}`))
+    .then(() => m.route.set(`/facility/${state.facilityLicenseNumber}`))
 }
 
 /**

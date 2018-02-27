@@ -1,20 +1,20 @@
 [
   {
-    "name": "fish",
+    "name": "facility",
     "properties": [
         {
-          "name": "species",
+          "name": "facilityLicenseType",
           "dataType": 1,
           "required": true
         },
         {
-          "name": "length",
-          "dataType": 2,
+          "name": "facilityLegalName",
+          "dataType": 1,
           "required": true
         },
         {
-          "name": "weight",
-          "dataType": 2,
+          "name": "facilityManager",
+          "dataType": 1,
           "required": true
         },
         {
@@ -23,15 +23,31 @@
           "required": true
         },
         {
-          "name": "temperature",
-          "dataType": 2
-        },
-        {
-          "name": "tilt",
+          "name": "administration",
           "dataType": 1
         },
         {
-          "name": "shock",
+          "name": "plants",
+          "dataType": 1
+        },
+        {
+          "name": "packages",
+          "dataType": 1
+        },
+        {
+          "name": "transfers",
+          "dataType": 1
+        },
+        {
+          "name": "sales",
+          "dataType": 1
+        },
+        {
+          "name": "reports",
+          "dataType": 1
+        },
+        {
+          "name": "financials",
           "dataType": 1
         }
     ]
