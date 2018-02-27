@@ -29,7 +29,7 @@ const {
 const modals = require('../components/modals')
 const api = require('../services/api')
 
-const STORAGE_KEY = 'fish_net.encryptedKey'
+const STORAGE_KEY = 'patienceio.encryptedKey'
 const FAMILY_NAME = 'supply_chain'
 const FAMILY_VERSION = '1.0'
 const NAMESPACE = '3400de'

@@ -2,7 +2,7 @@
 
   "JWT_SECRET": "shhhhh",
   "PRIVATE_KEY": "1111111111111111111111111111111111111111111111111111111111111111",
-  "MAPS_API_KEY": "https://developers.google.com/maps/documentation/javascript/get-api-key",
+  "MAPS_API_KEY": "AIzaSyBUpjoq7KzVYWVAeaQXQUe9YlSvetIhJwQ",
 
   "PORT": 3000,
   "RETRY_WAIT": 5000,

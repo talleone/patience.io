@@ -36,10 +36,13 @@ const {
  * Possible selection options
  */
 const authorizableProperties = [
-  ['location', 'Location'],
-  ['temperature', 'Temperature'],
-  ['tilt', 'Tilt'],
-  ['shock', 'Shock']
+  ['administration', 'Administration'],
+  ['plants', 'Plants'],
+  ['packages', 'Packages'],
+  ['transfers', 'Transfers'],
+  ['sales', 'Sales'],
+  ['reports', 'Reports'],
+  ['financials', 'Financials']
 ]
 
 const _labelProperty = (label, value) => [
@@ -500,7 +503,7 @@ const AuthorizeReporter = {
   }
 }
 
-const FishDetail = {
+const FacilityDetail = {
   oninit (vnode) {
     _loadData(vnode.attrs.recordId, vnode.state)
     vnode.state.refreshId = setInterval(() => {
@@ -522,7 +525,7 @@ const FishDetail = {
     let custodian = vnode.state.custodian
     let record = vnode.state.record
     return [
-      m('.fish-detail',
+      m('.facility-detail',
         m('h1.text-center', record.recordId),
         _row(
           _labelProperty('Created',
@@ -552,12 +555,9 @@ const FishDetail = {
             onsuccess: () => _loadData(vnode.attrs.recordId, vnode.state)
           })),
 
-        _row(_labelProperty('Species', getPropertyValue(record, 'species'))),
-
-        _row(
-          _labelProperty('Length (m)', parsing.toFloat(getPropertyValue(record, 'length', 0))),
-          _labelProperty('Weight (kg)', parsing.toFloat(getPropertyValue(record, 'weight', 0)))),
-
+        _row(_labelProperty('License Type', getPropertyValue(record, 'facilityLicenseType'))),
+        _row(_labelProperty('Legal Name', getPropertyValue(record, 'facilityLegalName'))),
+        _row(_labelProperty('Manager', getPropertyValue(record, 'facilityManager'))),
         _row(
           _labelProperty(
             'Location',
@@ -566,45 +566,12 @@ const FishDetail = {
           (isReporter(record, 'location', publicKey) && !record.final
            ? m(ReportLocation, { record, onsuccess: () => _loadData(record.recordId, vnode.state) })
            : null)),
-
-        _row(
-          _labelProperty(
-            'Temperature',
-            _propLink(record, 'temperature', _formatTemp(getPropertyValue(record, 'temperature')))),
-          (isReporter(record, 'temperature', publicKey) && !record.final
-          ? m(ReportValue,
-            {
-              name: 'temperature',
-              label: 'Temperature (C°)',
-              record,
-              typeField: 'intValue',
-              type: payloads.updateProperties.enum.INT,
-              xform: (x) => parsing.toInt(x),
-              onsuccess: () => _loadData(vnode.attrs.recordId, vnode.state)
-            })
-           : null)),
-
-        _row(
-          _labelProperty(
-            'Tilt',
-            _propLink(record, 'tilt', _formatValue(record, 'tilt'))),
-          (isReporter(record, 'tilt', publicKey) && !record.final
-           ? m(ReportTilt, {
-             record,
-             onsuccess: () => _loadData(vnode.attrs.recordId, vnode.state)
-           })
-           : null)),
-
-        _row(
-          _labelProperty(
-            'Shock',
-            _propLink(record, 'shock', _formatValue(record, 'shock'))),
-          (isReporter(record, 'shock', publicKey) && !record.final
-           ? m(ReportShock, {
-             record,
-             onsuccess: () => _loadData(vnode.attrs.recordId, vnode.state)
-           })
-           : null)),
+        _row(_labelProperty('Administration', getPropertyValue(record, 'administration'))),
+        _row(_labelProperty('Plants', getPropertyValue(record, 'plants'))),
+        _row(_labelProperty('packages', getPropertyValue(record, 'packages'))),
+        _row(_labelProperty('Transfers', getPropertyValue(record, 'transfers'))),
+        _row(_labelProperty('Sales', getPropertyValue(record, 'sales'))),
+        _row(_labelProperty('Reports', getPropertyValue(record, 'reports'))),
 
         _row(m(ReporterControl, {
           record,
@@ -750,4 +717,4 @@ const _revokeAuthorization = (record, reporterKey, properties) => {
   })
 }
 
-module.exports = FishDetail
+module.exports = FacilityDetail

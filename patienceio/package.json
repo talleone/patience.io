@@ -1,7 +1,7 @@
 {
-  "name": "fish_net",
+  "name": "patienceio",
   "version": "0.0.0",
-  "description": "A Sawtooth Supply Chain client web app for trading fish",
+  "description": "A Sawtooth Supply Chain client web app for trading patienceio",
   "main": "",
   "scripts": {
     "compile_protos": "node scripts/compile_protos.js > src/protos.json",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/sawtooth-supply-chain.git"
+    "url": "https://github.com/talleone/patience.io.git"
   },
   "author": "",
   "license": "Apache-2.0",
