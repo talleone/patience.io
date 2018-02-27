@@ -138,6 +138,19 @@ services:
     depends_on:
       - server
 
+  patienceio:
+    image: supply-patienceio-client
+    container_name: supply-patienceio-client
+    build: ./patienceio
+    volumes:
+      - ./patienceio/public/:/usr/local/apache2/htdocs/
+    expose:
+      - 80
+    ports:
+      - '8019:80'
+    depends_on:
+      - server
+
   rethink:
     image: rethinkdb
     container_name: supply-rethink
