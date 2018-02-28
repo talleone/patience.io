@@ -16,105 +16,118 @@
  */
 'use strict'
 
+// These requires inform webpack which styles to build
+require('bootstrap')
+require('../styles/main.scss')
+
 const m = require('mithril')
-const _ = require('lodash')
-const sjcl = require('sjcl')
 
-const API_PATH = 'api/'
-const STORAGE_KEY = 'patienceio.authorization'
-let authToken = null
+const api = require('./services/api')
+const transactions = require('./services/transactions')
+const navigation = require('./components/navigation')
+
+const AddFacilityForm = require('./views/add_facility_form')
+const AgentDetailPage = require('./views/agent_detail')
+const AgentList = require('./views/list_agents')
+const FacilityList = require('./views/list_facility')
+const FacilityDetail = require('./views/facility_detail')
+const Dashboard = require('./views/dashboard')
+const LoginForm = require('./views/login_form')
+const PropertyDetailPage = require('./views/property_detail')
+const SignupForm = require('./views/signup_form')
 
 /**
- * Generates a base-64 encoded SHA-256 hash of a plain text password
- * for submission to authorization routes
+ * A basic layout component that adds the navbar to the view.
  */
-const hashPassword = password => {
-  const bits = sjcl.hash.sha256.hash(password)
-  return sjcl.codec.base64.fromBits(bits)
-}
-
-/**
- * Getters and setters to handle the auth token both in memory and storage
- */
-const getAuth = () => {
-  if (!authToken) {
-    authToken = window.localStorage.getItem(STORAGE_KEY)
+const Layout = {
+  view (vnode) {
+    return [
+      vnode.attrs.navbar,
+      m('.content.container', vnode.children)
+    ]
   }
-  return authToken
 }
 
-const setAuth = token => {
-  window.localStorage.setItem(STORAGE_KEY, token)
-  authToken = token
-  return authToken
+const loggedInNav = () => {
+  const links = [
+    ['/create', 'Add Facility'],
+    ['/facility', 'View Facilities'],
+    ['/agents', 'View Agents']
+  ]
+  return m(navigation.Navbar, {}, [
+    navigation.links(links),
+    navigation.link('/profile', 'Profile'),
+    navigation.button('/logout', 'Logout')
+  ])
 }
 
-const clearAuth = () => {
-  const token = getAuth()
-  window.localStorage.clear(STORAGE_KEY)
-  authToken = null
-  return token
-}
-
-/**
- * Parses the authToken to return the logged in user's public key
- */
-const getPublicKey = () => {
-  const token = getAuth()
-  if (!token) return null
-  return window.atob(token.split('.')[1])
-}
-
-// Adds Authorization header and prepends API path to url
-const baseRequest = opts => {
-  const Authorization = getAuth()
-  const authHeader = Authorization ? { Authorization } : {}
-  opts.headers = _.assign(opts.headers, authHeader)
-  opts.url = API_PATH + opts.url
-  return m.request(opts)
+const loggedOutNav = () => {
+  const links = [
+    ['/facility', 'View Facility'],
+    ['/agents', 'View Agents']
+  ]
+  return m(navigation.Navbar, {}, [
+    navigation.links(links),
+    navigation.button('/login', 'Login/Signup')
+  ])
 }
 
 /**
- * Submits a request to an api endpoint with an auth header if present
+ * Returns a route resolver which handles authorization related business.
  */
-const request = (method, endpoint, data) => {
-  return baseRequest({
-    method,
-    url: endpoint,
-    data
+const resolve = (view, restricted = false) => {
+  const resolver = {}
+
+  if (restricted) {
+    resolver.onmatch = () => {
+      if (api.getAuth()) return view
+      m.route.set('/login')
+    }
+  }
+
+  resolver.render = vnode => {
+    if (api.getAuth()) {
+      return m(Layout, { navbar: loggedInNav() }, m(view, vnode.attrs))
+    }
+    return m(Layout, { navbar: loggedOutNav() }, m(view, vnode.attrs))
+  }
+
+  return resolver
+}
+
+/**
+ * Clears user info from memory/storage and redirects.
+ */
+const logout = () => {
+  api.clearAuth()
+  transactions.clearPrivateKey()
+  m.route.set('/')
+}
+
+/**
+ * Redirects to user's agent page if logged in.
+ */
+const profile = () => {
+  const publicKey = api.getPublicKey()
+  if (publicKey) m.route.set(`/agents/${publicKey}`)
+  else m.route.set('/')
+}
+
+/**
+ * Build and mount app/router
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  m.route(document.querySelector('#app'), '/', {
+    '/': resolve(Dashboard),
+    '/agents/:publicKey': resolve(AgentDetailPage),
+    '/agents': resolve(AgentList),
+    '/create': resolve(AddFacilityForm, true),
+    '/facility/:recordId': resolve(FacilityDetail),
+    '/facility': resolve(FacilityList),
+    '/login': resolve(LoginForm),
+    '/logout': { onmatch: logout },
+    '/profile': { onmatch: profile },
+    '/facility/:recordId/:name': resolve(PropertyDetailPage),
+    '/signup': resolve(SignupForm)
   })
-}
-
-/**
- * Method specific versions of request
- */
-const get = _.partial(request, 'GET')
-const post = _.partial(request, 'POST')
-const patch = _.partial(request, 'PATCH')
-
-/**
- * Method for posting a binary file to the API
- */
-const postBinary = (endpoint, data) => {
-  return baseRequest({
-    method: 'POST',
-    url: endpoint,
-    headers: { 'Content-Type': 'application/octet-stream' },
-    // prevent Mithril from trying to JSON stringify the body
-    serialize: x => x,
-    data
-  })
-}
-
-module.exports = {
-  hashPassword,
-  getAuth,
-  setAuth,
-  clearAuth,
-  getPublicKey,
-  request,
-  get,
-  post,
-  patch,
-  postBinary
-}
+})
